@@ -58,6 +58,15 @@ final class MovieQuizViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
     }
+    
+    @IBAction
+    private func noButtonClicked(_ sender: UIButton) {
+        
+    }
+    
+    @IBAction
+    private func yesButtonClicked(_ sender: UIButton) {
+    }
 }
 
 private struct QuizQuestion {
