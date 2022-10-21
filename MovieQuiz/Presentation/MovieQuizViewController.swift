@@ -81,7 +81,9 @@ final class MovieQuizViewController: UIViewController {
         // здесь мы заполняем нашу картинку, текст и счётчик данными
         textLabel.text = step.question
         counterLabel.text = step.questionNumber
+        
         imageView.image = step.image
+        imageView.layer.borderWidth = 0
     }
     
     private func show(quiz result: QuizResultsViewModel) {
