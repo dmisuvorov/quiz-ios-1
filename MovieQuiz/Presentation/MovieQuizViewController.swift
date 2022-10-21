@@ -1,6 +1,8 @@
 import UIKit
 
 final class MovieQuizViewController: UIViewController {
+    override var preferredStatusBarStyle: UIStatusBarStyle { .lightContent }
+    
     private var currentQuestionIndex: Int = 0
     private var correctAnswers: Int = 0
     
