@@ -85,6 +85,8 @@ final class MovieQuizViewController: UIViewController {
         counterLabel.text = step.questionNumber
         
         imageView.image = step.image
+        imageView.layer.masksToBounds = true
+        imageView.layer.cornerRadius = 20
         imageView.layer.borderWidth = 0
     }
     

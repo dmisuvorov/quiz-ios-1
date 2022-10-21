@@ -45,8 +45,9 @@
                                             </label>
                                         </subviews>
                                     </stackView>
-                                    <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="ihw-jp-k8A" userLabel="Preview Image">
+                                    <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="ihw-jp-k8A" userLabel="Preview Image">
                                         <rect key="frame" x="0.0" y="43.666666666666657" width="335" height="466.33333333333337"/>
+                                        <color key="backgroundColor" name="YP White"/>
                                         <constraints>
                                             <constraint firstAttribute="width" secondItem="ihw-jp-k8A" secondAttribute="height" multiplier="2:3" priority="1" id="RJ9-Ah-zyw"/>
                                         </constraints>
