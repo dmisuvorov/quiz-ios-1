@@ -127,7 +127,7 @@
                         <constraints>
                             <constraint firstItem="6Tk-OE-BBY" firstAttribute="trailing" secondItem="yPK-GQ-WMq" secondAttribute="trailing" constant="20" id="Fet-KT-c3Y"/>
                             <constraint firstItem="yPK-GQ-WMq" firstAttribute="leading" secondItem="6Tk-OE-BBY" secondAttribute="leading" constant="20" id="GZA-mH-J9q"/>
-                            <constraint firstItem="6Tk-OE-BBY" firstAttribute="bottom" secondItem="yPK-GQ-WMq" secondAttribute="bottom" id="isT-2C-xx7"/>
+                            <constraint firstAttribute="bottom" secondItem="yPK-GQ-WMq" secondAttribute="bottom" constant="34" id="isT-2C-xx7"/>
                             <constraint firstItem="yPK-GQ-WMq" firstAttribute="top" secondItem="6Tk-OE-BBY" secondAttribute="top" constant="10" id="jtU-e9-ICe"/>
                         </constraints>
                     </view>
