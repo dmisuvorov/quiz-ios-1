@@ -121,8 +121,8 @@ final class MovieQuizViewController: UIViewController {
             correctAnswers += 1
         }
         
-        previewImageView.layer.masksToBounds = true
         previewImageView.layer.borderColor = isCorrect ? UIColor.ypGreen.cgColor : UIColor.ypRed.cgColor
+        previewImageView.layer.borderWidth = 8
         
         DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
             self.showNextQuestionOrResults()
