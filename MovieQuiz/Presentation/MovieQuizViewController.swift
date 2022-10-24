@@ -85,8 +85,6 @@ final class MovieQuizViewController: UIViewController {
         counterLabel.text = step.questionNumber
         
         previewImageView.image = step.image
-        previewImageView.layer.masksToBounds = true
-        previewImageView.layer.cornerRadius = 20
         previewImageView.layer.borderWidth = 0
     }
     
@@ -124,8 +122,6 @@ final class MovieQuizViewController: UIViewController {
         }
         
         previewImageView.layer.masksToBounds = true
-        previewImageView.layer.borderWidth = 8
-        previewImageView.layer.cornerRadius = 20
         previewImageView.layer.borderColor = isCorrect ? UIColor.ypGreen.cgColor : UIColor.ypRed.cgColor
         
         DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {

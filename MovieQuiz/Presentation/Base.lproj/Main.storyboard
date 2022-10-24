@@ -51,6 +51,12 @@
                                         <constraints>
                                             <constraint firstAttribute="width" secondItem="ihw-jp-k8A" secondAttribute="height" multiplier="2:3" priority="1" id="RJ9-Ah-zyw"/>
                                         </constraints>
+                                        <userDefinedRuntimeAttributes>
+                                            <userDefinedRuntimeAttribute type="boolean" keyPath="layer.masksToBounds" value="YES"/>
+                                            <userDefinedRuntimeAttribute type="number" keyPath="layer.cornerRadius">
+                                                <integer key="value" value="20"/>
+                                            </userDefinedRuntimeAttribute>
+                                        </userDefinedRuntimeAttributes>
                                     </imageView>
                                     <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="cfW-ET-TAa">
                                         <rect key="frame" x="0.0" y="564" width="335" height="80"/>
