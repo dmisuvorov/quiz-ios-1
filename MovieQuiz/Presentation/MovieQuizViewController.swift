@@ -51,10 +51,10 @@ final class MovieQuizViewController: UIViewController {
     
     
     @IBOutlet
-    private var imageView: UIImageView!
+    private var previewImageView: UIImageView!
     
     @IBOutlet
-    private var textLabel: UILabel!
+    private var questionTextLabel: UILabel!
     
     @IBOutlet
     private var counterLabel: UILabel!
@@ -81,13 +81,13 @@ final class MovieQuizViewController: UIViewController {
     
     private func show(quiz step: QuizStepViewModel) {
         // здесь мы заполняем нашу картинку, текст и счётчик данными
-        textLabel.text = step.question
+        questionTextLabel.text = step.question
         counterLabel.text = step.questionNumber
         
-        imageView.image = step.image
-        imageView.layer.masksToBounds = true
-        imageView.layer.cornerRadius = 20
-        imageView.layer.borderWidth = 0
+        previewImageView.image = step.image
+        previewImageView.layer.masksToBounds = true
+        previewImageView.layer.cornerRadius = 20
+        previewImageView.layer.borderWidth = 0
     }
     
     private func show(quiz result: QuizResultsViewModel) {
@@ -123,10 +123,10 @@ final class MovieQuizViewController: UIViewController {
             correctAnswers += 1
         }
         
-        imageView.layer.masksToBounds = true
-        imageView.layer.borderWidth = 8
-        imageView.layer.cornerRadius = 20
-        imageView.layer.borderColor = isCorrect ? UIColor.ypGreen.cgColor : UIColor.ypRed.cgColor
+        previewImageView.layer.masksToBounds = true
+        previewImageView.layer.borderWidth = 8
+        previewImageView.layer.cornerRadius = 20
+        previewImageView.layer.borderColor = isCorrect ? UIColor.ypGreen.cgColor : UIColor.ypRed.cgColor
         
         DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
             self.showNextQuestionOrResults()
