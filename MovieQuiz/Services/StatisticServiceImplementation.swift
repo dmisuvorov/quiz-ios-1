@@ -79,7 +79,7 @@ final class StatisticServiceImplementation : StatisticService {
         return """
             Ваш результат: \(count) из \(amount)
             Количество сыгранных квизов: \(gamesCount)
-            Рекорд: \(bestGame.correct) \(bestGame.date.dateTimeString)
+            Рекорд: \(bestGame.correct)/\(amount) (\(bestGame.date.dateTimeString))
             Средняя точность: \(String(format: "%.2f", totalAccuracy * 100))%
         """
     }
