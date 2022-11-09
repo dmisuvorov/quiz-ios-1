@@ -25,7 +25,7 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
     override func viewDidLoad() {
         super.viewDidLoad()
         questionFactory = QuestionFactory(delegate: self)
-        questionFactory?.requestNextQuestion()
+        showFirstQuestion()
     }
     
     // MARK: - QuestionFactoryDelegate
@@ -55,6 +55,12 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
     }
     
     // MARK: - Private functions
+    private func showFirstQuestion() {
+        correctAnswers = 0
+        currentQuestionIndex = 0
+        questionFactory?.requestNextQuestion()
+    }
+    
     private func show(quiz step: QuizStepViewModel) {
         // здесь мы заполняем нашу картинку, текст и счётчик данными
         questionTextLabel.text = step.question
@@ -72,7 +78,7 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
             buttonText: result.buttonText) { [weak self] in
                 guard let self = self else { return }
                 
-                self.questionFactory?.requestNextQuestion()
+                self.showFirstQuestion()
             }
         alertPresenter.showAlert(parentController: self, alertModel: alert)
     }
