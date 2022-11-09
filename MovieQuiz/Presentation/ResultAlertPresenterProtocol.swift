@@ -8,6 +8,6 @@
 import Foundation
 import UIKit
 
-protocol AlertPresenterProtocol {
+protocol ResultAlertPresenterProtocol {
     func showAlert(parentController: UIViewController, alertModel: AlertModel)
 }

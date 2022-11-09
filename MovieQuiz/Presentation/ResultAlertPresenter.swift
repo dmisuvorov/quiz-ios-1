@@ -8,7 +8,7 @@
 import Foundation
 import UIKit
 
-class AlertPresenter: AlertPresenterProtocol {
+class ResultAlertPresenter: ResultAlertPresenterProtocol {
     
     func showAlert(parentController: UIViewController, alertModel: AlertModel) {
         let alert = UIAlertController(
