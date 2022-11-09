@@ -8,6 +8,7 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
     private var correctAnswers: Int = 0
     private let questionsAmount: Int = 10
     private let alertPresenter: AlertPresenterProtocol = AlertPresenter()
+    private let statisticService: StatisticService = StatisticServiceImplementation()
     private var questionFactory: QuestionFactoryProtocol?
     private var currentQuestion: QuizQuestion?
     
@@ -93,8 +94,10 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
     
     private func showNextQuestionOrResults() {
         if currentQuestionIndex == questionsAmount - 1 { // - 1 потому что индекс начинается с 0, а длинна массива — с 1
+            // сохранить результаты квиза
+            statisticService.store(correct: correctAnswers, total: questionsAmount)
             // показать результат квиза
-            let text = "Ваш результат: \(correctAnswers) из \(questionsAmount)"
+            let text = statisticService.getResultStatisticMessage(correct: correctAnswers, total: questionsAmount)
             let viewModel = QuizResultsViewModel(
                 title: "Этот раунд окончен!",
                 text: text,

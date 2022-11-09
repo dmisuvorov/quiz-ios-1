@@ -8,8 +8,6 @@
 import Foundation
 
 final class StatisticServiceImplementation : StatisticService {
-    private let userDefaults = UserDefaults.standard
-    
     //MARK: - StatisticService property
     var totalAccuracy: Double {
         Double(totalCorrectAnswers) / Double(totalQuestions)
@@ -45,6 +43,8 @@ final class StatisticServiceImplementation : StatisticService {
     }
     
     //MARK: - private property
+    private let userDefaults = UserDefaults.standard
+    
     private var totalCorrectAnswers: Int {
         get {
             userDefaults.integer(forKey: Keys.correct.rawValue)
@@ -73,6 +73,15 @@ final class StatisticServiceImplementation : StatisticService {
         totalCorrectAnswers += newResult.correct
         totalQuestions += newResult.total
         gamesCount += 1
+    }
+    
+    func getResultStatisticMessage(correct count: Int, total amount: Int) -> String {
+        return """
+            Ваш результат: \(count) из \(amount)
+            Количество сыгранных квизов: \(gamesCount)
+            Рекорд: \(bestGame.correct) \(bestGame.date.dateTimeString)
+            Средняя точность: \(String(format: "%.2f", totalAccuracy * 100))%
+        """
     }
 }
 
