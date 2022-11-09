@@ -10,7 +10,7 @@ import Foundation
 class QuestionFactory : QuestionFactoryProtocol {
     private weak var delegate: QuestionFactoryDelegate?
     
-    private let questions: [QuizQuestion] = [
+    private let possibleQuestions: [QuizQuestion] = [
         QuizQuestion(
             image: "The Godfather",
             text: "Рейтинг этого фильма больше чем 6?",
@@ -53,8 +53,14 @@ class QuestionFactory : QuestionFactoryProtocol {
             correctAnswer: false)
     ]
     
+    private var questions: [QuizQuestion] = []
+    
     init(delegate: QuestionFactoryDelegate?) {
         self.delegate = delegate
+    }
+    
+    func resetQuestions() {
+        self.questions = possibleQuestions
     }
     
     func requestNextQuestion() {
@@ -63,6 +69,7 @@ class QuestionFactory : QuestionFactoryProtocol {
             return
         }
         let question = questions[safe: index]
+        questions.remove(at: index)
         delegate?.didReceiveNextQuestion(question: question)
     }
 }
