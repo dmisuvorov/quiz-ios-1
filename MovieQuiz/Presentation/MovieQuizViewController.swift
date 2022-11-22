@@ -70,7 +70,6 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
     private func showFirstQuestion() {
         correctAnswers = 0
         currentQuestionIndex = 0
-        questionFactory?.resetQuestions()
         questionFactory?.requestNextQuestion()
     }
     
