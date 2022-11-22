@@ -27,7 +27,7 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
     // MARK: - Lifecycle
     override func viewDidLoad() {
         super.viewDidLoad()
-        questionFactory = QuestionFactory(delegate: self)
+        questionFactory = QuestionFactory(delegate: self, moviesLoader: MoviesLoader())
         showFirstQuestion()
     }
     
@@ -70,7 +70,9 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
     private func showFirstQuestion() {
         correctAnswers = 0
         currentQuestionIndex = 0
-        questionFactory?.requestNextQuestion()
+        
+        questionFactory?.loadData()
+        showLoadingIndicator()
     }
     
     private func show(quiz step: QuizStepViewModel) {
@@ -154,7 +156,7 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
     
     private func convert(model: QuizQuestion) -> QuizStepViewModel {
         return QuizStepViewModel(
-            image: UIImage(named: model.image) ?? UIImage(), // распаковываем картинку
+            image: UIImage(data: model.image) ?? UIImage(),
             question: model.text, // берём текст вопроса
             questionNumber: "\(currentQuestionIndex + 1)/\(questionsAmount)") // высчитываем номер вопроса
     }
