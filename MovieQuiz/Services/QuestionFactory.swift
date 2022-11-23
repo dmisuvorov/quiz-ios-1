@@ -96,9 +96,20 @@ class QuestionFactory : QuestionFactoryProtocol {
             
             let rating = Float(movie.rating) ?? 0
                 
-            let text = "Рейтинг этого фильма больше чем 7?"
-            let correctAnswer = rating > 7
-                
+            let questionRating = (1..<10).randomElement() ?? 0
+            let questionCompare = CompareQuestion.allCases.randomElement() ?? CompareQuestion.MORE
+            var text: String
+            var correctAnswer: Bool
+            
+            switch questionCompare {
+            case .MORE:
+                text = "Рейтинг этого фильма больше чем \(questionRating)?"
+                correctAnswer = rating > Float(questionRating)
+            case .LESS:
+                text = "Рейтинг этого фильма меньше чем \(questionRating)?"
+                correctAnswer = rating < Float(questionRating)
+            }
+            
             let question = QuizQuestion(image: imageData,
                                         text: text,
                                         correctAnswer: correctAnswer)
@@ -176,3 +187,7 @@ class QuestionFactory : QuestionFactoryProtocol {
  Ответ: НЕТ
  */
 
+private enum CompareQuestion: CaseIterable {
+    case MORE
+    case LESS
+}
