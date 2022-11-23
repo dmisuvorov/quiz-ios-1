@@ -139,8 +139,10 @@
                     <connections>
                         <outlet property="activityIndicator" destination="H9R-vA-sD2" id="Jcg-a4-9e5"/>
                         <outlet property="counterLabel" destination="DSm-V4-gRd" id="cQa-2S-coy"/>
+                        <outlet property="noButton" destination="qoz-sw-YSJ" id="XnV-uZ-3yA"/>
                         <outlet property="previewImageView" destination="ihw-jp-k8A" id="Gip-yf-PqK"/>
                         <outlet property="questionTextLabel" destination="655-ww-X4B" id="7Ux-7w-T9n"/>
+                        <outlet property="yesButton" destination="qGK-ZE-DT9" id="7sr-x7-p2R"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="dkx-z0-nzr" sceneMemberID="firstResponder"/>

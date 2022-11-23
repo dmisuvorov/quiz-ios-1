@@ -4,6 +4,7 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
     
     override var preferredStatusBarStyle: UIStatusBarStyle { .lightContent }
     
+    private let debounceDelay = 1.5
     private var currentQuestionIndex: Int = 0
     private var correctAnswers: Int = 0
     private let questionsAmount: Int = 10
@@ -23,6 +24,12 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
     
     @IBOutlet
     private var activityIndicator: UIActivityIndicatorView!
+    
+    @IBOutlet
+    private var noButton: UIButton!
+    
+    @IBOutlet
+    private var yesButton: UIButton!
     
     // MARK: - Lifecycle
     override func viewDidLoad() {
@@ -56,6 +63,7 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
     private func noButtonClicked(_ sender: UIButton) {
         guard let currentQuestion = currentQuestion else { return }
         let givenAnswer = false
+        debounceButton()
         showAnswerResult(isCorrect: givenAnswer == currentQuestion.correctAnswer)
     }
     
@@ -63,10 +71,25 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
     private func yesButtonClicked(_ sender: UIButton) {
         guard let currentQuestion = currentQuestion else { return }
         let givenAnswer = true
+        debounceButton()
         showAnswerResult(isCorrect: givenAnswer == currentQuestion.correctAnswer)
     }
     
     // MARK: - Private functions
+    private func debounceButton() {
+        noButton.isEnabled = false
+        yesButton.isEnabled = false
+        
+        let deadline = DispatchTime.now() + debounceDelay
+        
+        DispatchQueue.main.asyncAfter(deadline: deadline) { [weak self] in
+            guard let self = self else { return }
+            
+            self.noButton.isEnabled = true
+            self.yesButton.isEnabled = true
+        }
+    }
+    
     private func showFirstQuestion() {
         correctAnswers = 0
         currentQuestionIndex = 0
