@@ -4,6 +4,7 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
     
     override var preferredStatusBarStyle: UIStatusBarStyle { .lightContent }
     
+    private let debounceDelay = 1.5
     private var currentQuestionIndex: Int = 0
     private var correctAnswers: Int = 0
     private let questionsAmount: Int = 10
@@ -21,10 +22,19 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
     @IBOutlet
     private var counterLabel: UILabel!
     
+    @IBOutlet
+    private var activityIndicator: UIActivityIndicatorView!
+    
+    @IBOutlet
+    private var noButton: UIButton!
+    
+    @IBOutlet
+    private var yesButton: UIButton!
+    
     // MARK: - Lifecycle
     override func viewDidLoad() {
         super.viewDidLoad()
-        questionFactory = QuestionFactory(delegate: self)
+        questionFactory = QuestionFactory(delegate: self, moviesLoader: MoviesLoader())
         showFirstQuestion()
     }
     
@@ -39,11 +49,21 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
         }
     }
     
+    func didLoadDataFromServer() {
+        activityIndicator.isHidden = true // скрываем индикатор загрузки
+        questionFactory?.requestNextQuestion()
+    }
+
+    func didFailToLoadData(with error: Error) {
+        showNetworkError(message: error.localizedDescription) // возьмём в качестве сообщения описание ошибки
+    }
+    
     // MARK: - Actions
     @IBAction
     private func noButtonClicked(_ sender: UIButton) {
         guard let currentQuestion = currentQuestion else { return }
         let givenAnswer = false
+        debounceButton()
         showAnswerResult(isCorrect: givenAnswer == currentQuestion.correctAnswer)
     }
     
@@ -51,15 +71,31 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
     private func yesButtonClicked(_ sender: UIButton) {
         guard let currentQuestion = currentQuestion else { return }
         let givenAnswer = true
+        debounceButton()
         showAnswerResult(isCorrect: givenAnswer == currentQuestion.correctAnswer)
     }
     
     // MARK: - Private functions
+    private func debounceButton() {
+        noButton.isEnabled = false
+        yesButton.isEnabled = false
+        
+        let deadline = DispatchTime.now() + debounceDelay
+        
+        DispatchQueue.main.asyncAfter(deadline: deadline) { [weak self] in
+            guard let self = self else { return }
+            
+            self.noButton.isEnabled = true
+            self.yesButton.isEnabled = true
+        }
+    }
+    
     private func showFirstQuestion() {
         correctAnswers = 0
         currentQuestionIndex = 0
-        questionFactory?.resetQuestions()
-        questionFactory?.requestNextQuestion()
+        
+        questionFactory?.loadData()
+        showLoadingIndicator()
     }
     
     private func show(quiz step: QuizStepViewModel) {
@@ -117,9 +153,33 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
         }
     }
     
+    private func showLoadingIndicator() {
+        activityIndicator.isHidden = false // говорим, что индикатор загрузки не скрыт
+        activityIndicator.startAnimating() // включаем анимацию
+    }
+    
+    private func hideLoadingIndicator() {
+        activityIndicator.stopAnimating() // выключаем анимацию
+        activityIndicator.isHidden = true // говорим, что индикатор загрузки скрыт
+    }
+    
+    private func showNetworkError(message: String) {
+        hideLoadingIndicator()
+        
+        let model = AlertModel(title: "Ошибка",
+                               message: message,
+                               buttonText: "Попробовать еще раз") { [weak self] in
+            guard let self = self else { return }
+            
+            self.showFirstQuestion()
+        }
+        
+        alertPresenter.showAlert(parentController: self, alertModel: model)
+    }
+    
     private func convert(model: QuizQuestion) -> QuizStepViewModel {
         return QuizStepViewModel(
-            image: UIImage(named: model.image) ?? UIImage(), // распаковываем картинку
+            image: UIImage(data: model.image) ?? UIImage(),
             question: model.text, // берём текст вопроса
             questionNumber: "\(currentQuestionIndex + 1)/\(questionsAmount)") // высчитываем номер вопроса
     }
