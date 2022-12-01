@@ -112,7 +112,8 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
         let alert = AlertModel(
             title: result.title,
             message: result.text,
-            buttonText: result.buttonText) { [weak self] in
+            buttonText: result.buttonText,
+            accessibilityIdentifier: "Game Results") { [weak self] in
                 guard let self = self else { return }
                 
                 self.showFirstQuestion()
@@ -168,7 +169,8 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
         
         let model = AlertModel(title: "Ошибка",
                                message: message,
-                               buttonText: "Попробовать еще раз") { [weak self] in
+                               buttonText: "Попробовать еще раз",
+                               accessibilityIdentifier: "Game Error") { [weak self] in
             guard let self = self else { return }
             
             self.showFirstQuestion()
