@@ -1,6 +1,6 @@
 import UIKit
 
-final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
+final class MovieQuizViewController: UIViewController {
     
     override var preferredStatusBarStyle: UIStatusBarStyle { .lightContent }
     
@@ -8,7 +8,6 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
 
     private let debounceDelay = 1.5
     private let alertPresenter: ResultAlertPresenterProtocol = ResultAlertPresenter()
-    private var questionFactory: QuestionFactoryProtocol?
     
     @IBOutlet
     private var previewImageView: UIImageView!
@@ -32,23 +31,30 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
     override func viewDidLoad() {
         super.viewDidLoad()
         presenter = MovieQuizPresenter(viewController: self)
-        questionFactory = QuestionFactory(delegate: self, moviesLoader: MoviesLoader())
-        presenter?.questionFactory = questionFactory
-        showFirstQuestion()
     }
     
-    // MARK: - QuestionFactoryDelegate
-    func didReceiveNextQuestion(question: QuizQuestion?) {
-        presenter?.didReceiveNextQuestion(question: question)
+    // MARK: - Public functions for presenter
+    func showLoadingIndicator() {
+        activityIndicator.isHidden = false // говорим, что индикатор загрузки не скрыт
+        activityIndicator.startAnimating() // включаем анимацию
     }
     
-    func didLoadDataFromServer() {
-        activityIndicator.isHidden = true // скрываем индикатор загрузки
-        questionFactory?.requestNextQuestion()
+    func hideLoadingIndicator() {
+        activityIndicator.stopAnimating() // выключаем анимацию
+        activityIndicator.isHidden = true // говорим, что индикатор загрузки скрыт
     }
-
-    func didFailToLoadData(with error: Error) {
-        showNetworkError(message: error.localizedDescription) // возьмём в качестве сообщения описание ошибки
+    
+    func showNetworkError(message: String) {
+        let model = AlertModel(title: "Ошибка",
+                               message: message,
+                               buttonText: "Попробовать еще раз",
+                               accessibilityIdentifier: "Game Error") { [weak self] in
+            guard let self = self else { return }
+            
+            self.presenter?.showFirstQuestion()
+        }
+        
+        alertPresenter.showAlert(parentController: self, alertModel: model)
     }
     
     func showAnswerResult(isCorrect: Bool) {
@@ -82,7 +88,7 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
             accessibilityIdentifier: "Game Results") { [weak self] in
                 guard let self = self else { return }
                 
-                self.showFirstQuestion()
+                self.presenter?.showFirstQuestion()
             }
         alertPresenter.showAlert(parentController: self, alertModel: alert)
     }
@@ -113,37 +119,5 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
             self.noButton.isEnabled = true
             self.yesButton.isEnabled = true
         }
-    }
-    
-    private func showFirstQuestion() {
-        presenter?.resetQuestionIndex()
-        
-        questionFactory?.loadData()
-        showLoadingIndicator()
-    }
-    
-    private func showLoadingIndicator() {
-        activityIndicator.isHidden = false // говорим, что индикатор загрузки не скрыт
-        activityIndicator.startAnimating() // включаем анимацию
-    }
-    
-    private func hideLoadingIndicator() {
-        activityIndicator.stopAnimating() // выключаем анимацию
-        activityIndicator.isHidden = true // говорим, что индикатор загрузки скрыт
-    }
-    
-    private func showNetworkError(message: String) {
-        hideLoadingIndicator()
-        
-        let model = AlertModel(title: "Ошибка",
-                               message: message,
-                               buttonText: "Попробовать еще раз",
-                               accessibilityIdentifier: "Game Error") { [weak self] in
-            guard let self = self else { return }
-            
-            self.showFirstQuestion()
-        }
-        
-        alertPresenter.showAlert(parentController: self, alertModel: model)
     }
 }
