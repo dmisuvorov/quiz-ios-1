@@ -7,7 +7,6 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
     private var presenter: MovieQuizPresenter?
 
     private let debounceDelay = 1.5
-    private var correctAnswers: Int = 0
     private let alertPresenter: ResultAlertPresenterProtocol = ResultAlertPresenter()
     private var questionFactory: QuestionFactoryProtocol?
     
@@ -53,9 +52,7 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
     }
     
     func showAnswerResult(isCorrect: Bool) {
-        if isCorrect {
-            correctAnswers += 1
-        }
+        presenter?.didAnswer(isCorrectAnswer: isCorrect)
         
         previewImageView.layer.borderColor = isCorrect ? UIColor.ypGreen.cgColor : UIColor.ypRed.cgColor
         previewImageView.layer.borderWidth = 8
@@ -63,7 +60,6 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
         DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) { [weak self] in
             guard let self = self else { return }
             
-            self.presenter?.correctAnswers = self.correctAnswers
             self.presenter?.showNextQuestionOrResults()
         }
     }
@@ -120,29 +116,10 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
     }
     
     private func showFirstQuestion() {
-        correctAnswers = 0
         presenter?.resetQuestionIndex()
         
         questionFactory?.loadData()
         showLoadingIndicator()
-    }
-    
-    private func showNextQuestionOrResults() {
-//        if presenter?.isLastQuestion() {
-//            // сохранить результаты квиза
-//            statisticService.store(correct: correctAnswers, total: presenter.questionsAmount)
-//            // показать результат квиза
-//            let text = statisticService.getResultStatisticMessage(correct: correctAnswers, total: presenter.questionsAmount)
-//            let viewModel = QuizResultsViewModel(
-//                title: "Этот раунд окончен!",
-//                text: text,
-//                buttonText: "Сыграть ещё раз"
-//            )
-//            show(quiz: viewModel)
-//        } else {
-//            presenter?.switchToNextQuestion()
-//            questionFactory?.requestNextQuestion()
-//        }
     }
     
     private func showLoadingIndicator() {
