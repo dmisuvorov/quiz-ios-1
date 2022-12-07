@@ -11,7 +11,6 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
     private let alertPresenter: ResultAlertPresenterProtocol = ResultAlertPresenter()
     private let statisticService: StatisticService = StatisticServiceImplementation()
     private var questionFactory: QuestionFactoryProtocol?
-    private var currentQuestion: QuizQuestion?
     
     @IBOutlet
     private var previewImageView: UIImageView!
@@ -41,13 +40,7 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
     
     // MARK: - QuestionFactoryDelegate
     func didReceiveNextQuestion(question: QuizQuestion?) {
-        guard let question = question else { return }
-                
-        currentQuestion = question
-        let viewModel = presenter.convert(model: question)
-        DispatchQueue.main.async { [weak self] in
-            self?.show(quiz: viewModel)
-        }
+        presenter.didReceiveNextQuestion(question: question)
     }
     
     func didLoadDataFromServer() {
@@ -74,17 +67,24 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
         }
     }
     
+    func show(quiz step: QuizStepViewModel) {
+        // здесь мы заполняем нашу картинку, текст и счётчик данными
+        questionTextLabel.text = step.question
+        counterLabel.text = step.questionNumber
+        
+        previewImageView.image = step.image
+        previewImageView.layer.borderWidth = 0
+    }
+    
     // MARK: - Actions
     @IBAction
     private func noButtonClicked(_ sender: UIButton) {
-        presenter.currentQuestion = currentQuestion
         presenter.noButtonClicked()
         debounceButtons()
     }
     
     @IBAction
     private func yesButtonClicked(_ sender: UIButton) {
-        presenter.currentQuestion = currentQuestion
         presenter.yesButtonClicked()
         debounceButtons()
     }
@@ -110,15 +110,6 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
         
         questionFactory?.loadData()
         showLoadingIndicator()
-    }
-    
-    private func show(quiz step: QuizStepViewModel) {
-        // здесь мы заполняем нашу картинку, текст и счётчик данными
-        questionTextLabel.text = step.question
-        counterLabel.text = step.questionNumber
-        
-        previewImageView.image = step.image
-        previewImageView.layer.borderWidth = 0
     }
     
     private func show(quiz result: QuizResultsViewModel) {
