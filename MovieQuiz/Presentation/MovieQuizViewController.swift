@@ -4,12 +4,11 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
     
     override var preferredStatusBarStyle: UIStatusBarStyle { .lightContent }
     
-    private let presenter = MovieQuizPresenter()
+    private var presenter: MovieQuizPresenter?
 
     private let debounceDelay = 1.5
     private var correctAnswers: Int = 0
     private let alertPresenter: ResultAlertPresenterProtocol = ResultAlertPresenter()
-    private let statisticService: StatisticService = StatisticServiceImplementation()
     private var questionFactory: QuestionFactoryProtocol?
     
     @IBOutlet
@@ -33,14 +32,15 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
     // MARK: - Lifecycle
     override func viewDidLoad() {
         super.viewDidLoad()
-        presenter.viewController = self
+        presenter = MovieQuizPresenter(viewController: self)
         questionFactory = QuestionFactory(delegate: self, moviesLoader: MoviesLoader())
+        presenter?.questionFactory = questionFactory
         showFirstQuestion()
     }
     
     // MARK: - QuestionFactoryDelegate
     func didReceiveNextQuestion(question: QuizQuestion?) {
-        presenter.didReceiveNextQuestion(question: question)
+        presenter?.didReceiveNextQuestion(question: question)
     }
     
     func didLoadDataFromServer() {
@@ -63,7 +63,8 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
         DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) { [weak self] in
             guard let self = self else { return }
             
-            self.showNextQuestionOrResults()
+            self.presenter?.correctAnswers = self.correctAnswers
+            self.presenter?.showNextQuestionOrResults()
         }
     }
     
@@ -76,16 +77,30 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
         previewImageView.layer.borderWidth = 0
     }
     
+    func show(quiz result: QuizResultsViewModel) {
+        // здесь мы показываем результат прохождения квиза
+        let alert = AlertModel(
+            title: result.title,
+            message: result.text,
+            buttonText: result.buttonText,
+            accessibilityIdentifier: "Game Results") { [weak self] in
+                guard let self = self else { return }
+                
+                self.showFirstQuestion()
+            }
+        alertPresenter.showAlert(parentController: self, alertModel: alert)
+    }
+    
     // MARK: - Actions
     @IBAction
     private func noButtonClicked(_ sender: UIButton) {
-        presenter.noButtonClicked()
+        presenter?.noButtonClicked()
         debounceButtons()
     }
     
     @IBAction
     private func yesButtonClicked(_ sender: UIButton) {
-        presenter.yesButtonClicked()
+        presenter?.yesButtonClicked()
         debounceButtons()
     }
     
@@ -106,42 +121,28 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
     
     private func showFirstQuestion() {
         correctAnswers = 0
-        presenter.resetQuestionIndex()
+        presenter?.resetQuestionIndex()
         
         questionFactory?.loadData()
         showLoadingIndicator()
     }
     
-    private func show(quiz result: QuizResultsViewModel) {
-        // здесь мы показываем результат прохождения квиза
-        let alert = AlertModel(
-            title: result.title,
-            message: result.text,
-            buttonText: result.buttonText,
-            accessibilityIdentifier: "Game Results") { [weak self] in
-                guard let self = self else { return }
-                
-                self.showFirstQuestion()
-            }
-        alertPresenter.showAlert(parentController: self, alertModel: alert)
-    }
-    
     private func showNextQuestionOrResults() {
-        if presenter.isLastQuestion() {
-            // сохранить результаты квиза
-            statisticService.store(correct: correctAnswers, total: presenter.questionsAmount)
-            // показать результат квиза
-            let text = statisticService.getResultStatisticMessage(correct: correctAnswers, total: presenter.questionsAmount)
-            let viewModel = QuizResultsViewModel(
-                title: "Этот раунд окончен!",
-                text: text,
-                buttonText: "Сыграть ещё раз"
-            )
-            show(quiz: viewModel)
-        } else {
-            presenter.switchToNextQuestion()
-            questionFactory?.requestNextQuestion()
-        }
+//        if presenter?.isLastQuestion() {
+//            // сохранить результаты квиза
+//            statisticService.store(correct: correctAnswers, total: presenter.questionsAmount)
+//            // показать результат квиза
+//            let text = statisticService.getResultStatisticMessage(correct: correctAnswers, total: presenter.questionsAmount)
+//            let viewModel = QuizResultsViewModel(
+//                title: "Этот раунд окончен!",
+//                text: text,
+//                buttonText: "Сыграть ещё раз"
+//            )
+//            show(quiz: viewModel)
+//        } else {
+//            presenter?.switchToNextQuestion()
+//            questionFactory?.requestNextQuestion()
+//        }
     }
     
     private func showLoadingIndicator() {

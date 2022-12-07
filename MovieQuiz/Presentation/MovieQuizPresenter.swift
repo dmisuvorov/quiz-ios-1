@@ -9,11 +9,18 @@ import Foundation
 import UIKit
 
 final class MovieQuizPresenter {
-    weak var viewController: MovieQuizViewController?
+    private weak var viewController: MovieQuizViewController?
     
     let questionsAmount: Int = 10
+    var correctAnswers: Int = 0
     var currentQuestion: QuizQuestion?
+    var questionFactory: QuestionFactoryProtocol?
     private var currentQuestionIndex: Int = 0
+    private let statisticService: StatisticService = StatisticServiceImplementation()
+    
+    init(viewController: MovieQuizViewController) {
+        self.viewController = viewController
+    }
     
     func isLastQuestion() -> Bool {
         currentQuestionIndex == questionsAmount - 1
@@ -49,6 +56,24 @@ final class MovieQuizPresenter {
         let viewModel = convert(model: question)
         DispatchQueue.main.async { [weak self] in
             self?.viewController?.show(quiz: viewModel)
+        }
+    }
+    
+    func showNextQuestionOrResults() {
+        if self.isLastQuestion() {
+            // сохранить результаты квиза
+            statisticService.store(correct: correctAnswers, total: self.questionsAmount)
+            // показать результат квиза
+            let text = statisticService.getResultStatisticMessage(correct: correctAnswers, total: self.questionsAmount)
+            let viewModel = QuizResultsViewModel(
+                title: "Этот раунд окончен!",
+                text: text,
+                buttonText: "Сыграть ещё раз"
+            )
+            self.viewController?.show(quiz: viewModel)
+        } else {
+            self.switchToNextQuestion()
+            questionFactory?.requestNextQuestion()
         }
     }
     
