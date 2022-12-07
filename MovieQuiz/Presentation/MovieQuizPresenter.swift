@@ -106,6 +106,18 @@ final class MovieQuizPresenter: QuestionFactoryDelegate {
         }
     }
     
+    private func showAnswerResult(isCorrect: Bool) {
+        didAnswer(isCorrectAnswer: isCorrect)
+        
+        viewController?.highlightImageBorder(isCorrectAnswer: isCorrect)
+        
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) { [weak self] in
+            guard let self = self else { return }
+            
+            self.showNextQuestionOrResults()
+        }
+    }
+    
     private func didAnswer(isYes: Bool) {
         guard let currentQuestion = currentQuestion else {
             return
@@ -113,6 +125,6 @@ final class MovieQuizPresenter: QuestionFactoryDelegate {
             
         let givenAnswer = isYes
             
-        viewController?.showAnswerResult(isCorrect: givenAnswer == currentQuestion.correctAnswer)
+        showAnswerResult(isCorrect: givenAnswer == currentQuestion.correctAnswer)
     }
 }
