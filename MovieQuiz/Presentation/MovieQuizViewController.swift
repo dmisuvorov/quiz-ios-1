@@ -4,10 +4,10 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
     
     override var preferredStatusBarStyle: UIStatusBarStyle { .lightContent }
     
+    private let presenter = MovieQuizPresenter()
+
     private let debounceDelay = 1.5
-    private var currentQuestionIndex: Int = 0
     private var correctAnswers: Int = 0
-    private let questionsAmount: Int = 10
     private let alertPresenter: ResultAlertPresenterProtocol = ResultAlertPresenter()
     private let statisticService: StatisticService = StatisticServiceImplementation()
     private var questionFactory: QuestionFactoryProtocol?
@@ -43,7 +43,7 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
         guard let question = question else { return }
                 
         currentQuestion = question
-        let viewModel = convert(model: question)
+        let viewModel = presenter.convert(model: question)
         DispatchQueue.main.async { [weak self] in
             self?.show(quiz: viewModel)
         }
@@ -92,7 +92,7 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
     
     private func showFirstQuestion() {
         correctAnswers = 0
-        currentQuestionIndex = 0
+        presenter.resetQuestionIndex()
         
         questionFactory?.loadData()
         showLoadingIndicator()
@@ -137,11 +137,11 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
     }
     
     private func showNextQuestionOrResults() {
-        if currentQuestionIndex == questionsAmount - 1 { // - 1 потому что индекс начинается с 0, а длинна массива — с 1
+        if presenter.isLastQuestion() {
             // сохранить результаты квиза
-            statisticService.store(correct: correctAnswers, total: questionsAmount)
+            statisticService.store(correct: correctAnswers, total: presenter.questionsAmount)
             // показать результат квиза
-            let text = statisticService.getResultStatisticMessage(correct: correctAnswers, total: questionsAmount)
+            let text = statisticService.getResultStatisticMessage(correct: correctAnswers, total: presenter.questionsAmount)
             let viewModel = QuizResultsViewModel(
                 title: "Этот раунд окончен!",
                 text: text,
@@ -149,7 +149,7 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
             )
             show(quiz: viewModel)
         } else {
-            currentQuestionIndex += 1 // увеличиваем индекс текущего вопроса на 1; таким образом мы сможем получить следующий вопрос
+            presenter.switchToNextQuestion()
             questionFactory?.requestNextQuestion()
         }
     }
@@ -177,12 +177,5 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
         }
         
         alertPresenter.showAlert(parentController: self, alertModel: model)
-    }
-    
-    private func convert(model: QuizQuestion) -> QuizStepViewModel {
-        return QuizStepViewModel(
-            image: UIImage(data: model.image) ?? UIImage(),
-            question: model.text, // берём текст вопроса
-            questionNumber: "\(currentQuestionIndex + 1)/\(questionsAmount)") // высчитываем номер вопроса
     }
 }
