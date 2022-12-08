@@ -7,9 +7,12 @@
 @testable import MovieQuiz
 
 final class MovieQuizViewControllerProtocolMock: MovieQuizViewControllerProtocol {
+    var isShowStep = false
+    var isHideLoadingIndicator = false
+    var isShowNetworkError = false
     
     func show(quiz step: QuizStepViewModel) {
-    
+        isShowStep = true
     }
     
     func show(quiz result: QuizResultsViewModel) {
@@ -29,10 +32,10 @@ final class MovieQuizViewControllerProtocolMock: MovieQuizViewControllerProtocol
     }
     
     func hideLoadingIndicator() {
-    
+        isHideLoadingIndicator = true
     }
     
     func showNetworkError(message: String) {
-    
+        isShowNetworkError = true
     }
 }

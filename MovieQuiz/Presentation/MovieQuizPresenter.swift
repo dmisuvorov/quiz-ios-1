@@ -10,17 +10,29 @@ import UIKit
 
 final class MovieQuizPresenter: QuestionFactoryDelegate {
     private weak var viewController: MovieQuizViewControllerProtocol?
-    
-    let questionsAmount: Int = 10
-    var correctAnswers: Int = 0
-    var currentQuestion: QuizQuestion?
     private var questionFactory: QuestionFactoryProtocol?
-    private var currentQuestionIndex: Int = 0
+    private let mainDispatcher: DispatchingProtocol
     private let statisticService: StatisticService = StatisticServiceImplementation()
     
-    init(viewController: MovieQuizViewControllerProtocol) {
+    private let questionsAmount: Int = 10
+    private var correctAnswers: Int = 0
+    private var currentQuestion: QuizQuestion?
+    private var currentQuestionIndex: Int = 0
+    
+    init(viewController: MovieQuizViewControllerProtocol,
+         mainDispatcher: DispatchingProtocol = DispatchQueue.main,
+         globalDispatcher: DispatchingProtocol = DispatchQueue.global(),
+         moviesLoading: MoviesLoading = MoviesLoader()
+    ) {
         self.viewController = viewController
-        questionFactory = QuestionFactory(delegate: self, moviesLoader: MoviesLoader())
+        self.mainDispatcher = mainDispatcher
+        
+        self.questionFactory = QuestionFactory(
+            delegate: self,
+            moviesLoader: moviesLoading,
+            mainDispatcher: mainDispatcher,
+            globalDispatcher: globalDispatcher
+        )
         self.viewController?.showLoadingIndicator()
         self.showFirstQuestion()
     }
@@ -31,7 +43,7 @@ final class MovieQuizPresenter: QuestionFactoryDelegate {
                 
         currentQuestion = question
         let viewModel = convert(model: question)
-        DispatchQueue.main.async { [weak self] in
+        mainDispatcher.async { [weak self] in
             self?.viewController?.show(quiz: viewModel)
         }
     }
