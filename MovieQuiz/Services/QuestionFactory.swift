@@ -10,33 +10,40 @@ import Foundation
 class QuestionFactory : QuestionFactoryProtocol {
     private weak var delegate: QuestionFactoryDelegate?
     private let moviesLoader: MoviesLoading
+    private let mainDispatcher: DispatchingProtocol
+    private let globalDispatcher: DispatchingProtocol
     
     private var movies: [MostPopularMovie] = []
     
     private var questions: [QuizQuestion] = []
     
-    init(delegate: QuestionFactoryDelegate?, moviesLoader: MoviesLoading) {
+    init(delegate: QuestionFactoryDelegate?,
+         moviesLoader: MoviesLoading,
+         mainDispatcher: DispatchingProtocol = DispatchQueue.main,
+         globalDispatcher: DispatchingProtocol = DispatchQueue.global()) {
         self.delegate = delegate
         self.moviesLoader = moviesLoader
+        self.mainDispatcher = mainDispatcher
+        self.globalDispatcher = globalDispatcher
     }
     
     func loadData() {
         moviesLoader.loadMovies { result in
-            DispatchQueue.main.async { [weak self] in
+            self.mainDispatcher.async { [weak self] in
                 guard let self = self else { return }
                 switch result {
                 case .success(let mostPopularMovies):
-                    self.movies = mostPopularMovies.items // сохраняем фильм в нашу новую переменную
-                    self.delegate?.didLoadDataFromServer() // сообщаем, что данные загрузились
+                    self.movies = mostPopularMovies.items
+                    self.delegate?.didLoadDataFromServer()
                 case .failure(let error):
-                    self.delegate?.didFailToLoadData(with: error) // сообщаем об ошибке нашему MovieQuizViewController
+                    self.delegate?.didFailToLoadData(with: error)
                 }
             }
         }
     }
     
     func requestNextQuestion() {
-        DispatchQueue.global().async { [weak self] in
+        globalDispatcher.async { [weak self] in
             guard let self = self else { return }
             
             let index = (0..<self.movies.count).randomElement() ?? 0
@@ -71,7 +78,7 @@ class QuestionFactory : QuestionFactoryProtocol {
                                         text: text,
                                         correctAnswer: correctAnswer)
                 
-            DispatchQueue.main.async { [weak self] in
+            self.mainDispatcher.async { [weak self] in
                 guard let self = self else { return }
                 
                 self.delegate?.didReceiveNextQuestion(question: question)
