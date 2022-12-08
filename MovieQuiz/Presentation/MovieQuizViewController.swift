@@ -78,7 +78,7 @@ final class MovieQuizViewController: UIViewController, MovieQuizViewControllerPr
             title: result.title,
             message: result.text,
             buttonText: result.buttonText,
-            accessibilityIdentifier: "Game Results") { [weak self] in
+            accessibilityIdentifier: result.accessibilityId) { [weak self] in
                 guard let self = self else { return }
                 
                 self.presenter?.showFirstQuestion()
