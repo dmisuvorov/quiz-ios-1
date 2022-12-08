@@ -1,6 +1,6 @@
 import UIKit
 
-final class MovieQuizViewController: UIViewController {
+final class MovieQuizViewController: UIViewController, MovieQuizViewControllerProtocol {
     
     override var preferredStatusBarStyle: UIStatusBarStyle { .lightContent }
     
@@ -33,7 +33,7 @@ final class MovieQuizViewController: UIViewController {
         presenter = MovieQuizPresenter(viewController: self)
     }
     
-    // MARK: - Public functions for presenter
+    // MARK: - MovieQuizViewControllerProtocol
     func showLoadingIndicator() {
         activityIndicator.isHidden = false // говорим, что индикатор загрузки не скрыт
         activityIndicator.startAnimating() // включаем анимацию
@@ -42,6 +42,12 @@ final class MovieQuizViewController: UIViewController {
     func hideLoadingIndicator() {
         activityIndicator.stopAnimating() // выключаем анимацию
         activityIndicator.isHidden = true // говорим, что индикатор загрузки скрыт
+    }
+    
+    func highlightImageBorder(isCorrectAnswer: Bool) {
+        previewImageView.layer.masksToBounds = true
+        previewImageView.layer.borderColor = isCorrectAnswer ? UIColor.ypGreen.cgColor : UIColor.ypRed.cgColor
+        previewImageView.layer.borderWidth = 8
     }
     
     func showNetworkError(message: String) {
@@ -55,12 +61,6 @@ final class MovieQuizViewController: UIViewController {
         }
         
         alertPresenter.showAlert(parentController: self, alertModel: model)
-    }
-    
-    func highlightImageBorder(isCorrectAnswer: Bool) {
-        previewImageView.layer.masksToBounds = true
-        previewImageView.layer.borderColor = isCorrectAnswer ? UIColor.ypGreen.cgColor : UIColor.ypRed.cgColor
-        previewImageView.layer.borderWidth = 8
     }
     
     func show(quiz step: QuizStepViewModel) {

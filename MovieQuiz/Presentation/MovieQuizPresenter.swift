@@ -9,7 +9,7 @@ import Foundation
 import UIKit
 
 final class MovieQuizPresenter: QuestionFactoryDelegate {
-    private weak var viewController: MovieQuizViewController?
+    private weak var viewController: MovieQuizViewControllerProtocol?
     
     let questionsAmount: Int = 10
     var correctAnswers: Int = 0
@@ -18,7 +18,7 @@ final class MovieQuizPresenter: QuestionFactoryDelegate {
     private var currentQuestionIndex: Int = 0
     private let statisticService: StatisticService = StatisticServiceImplementation()
     
-    init(viewController: MovieQuizViewController) {
+    init(viewController: MovieQuizViewControllerProtocol) {
         self.viewController = viewController
         questionFactory = QuestionFactory(delegate: self, moviesLoader: MoviesLoader())
         self.viewController?.showLoadingIndicator()
