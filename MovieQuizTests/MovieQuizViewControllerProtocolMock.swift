@@ -7,6 +7,7 @@
 @testable import MovieQuiz
 
 final class MovieQuizViewControllerProtocolMock: MovieQuizViewControllerProtocol {
+    
     func show(quiz step: QuizStepViewModel) {
     
     }
@@ -17,6 +18,10 @@ final class MovieQuizViewControllerProtocolMock: MovieQuizViewControllerProtocol
     
     func highlightImageBorder(isCorrectAnswer: Bool) {
     
+    }
+    
+    func disableAndEnableButtonsAfterDelay() {
+
     }
     
     func showLoadingIndicator() {

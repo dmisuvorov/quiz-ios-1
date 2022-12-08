@@ -67,12 +67,6 @@ final class MovieQuizPresenter: QuestionFactoryDelegate {
         currentQuestionIndex += 1
     }
     
-    func didAnswer(isCorrectAnswer: Bool) {
-        if isCorrectAnswer {
-            correctAnswers += 1
-        }
-    }
-    
     func convert(model: QuizQuestion) -> QuizStepViewModel {
         return QuizStepViewModel(
             image: UIImage(data: model.image) ?? UIImage(),
@@ -89,10 +83,10 @@ final class MovieQuizPresenter: QuestionFactoryDelegate {
     }
     
     func showNextQuestionOrResults() {
-        if self.isLastQuestion() {
+        if isLastQuestion() {
             // сохранить результаты квиза
-            statisticService.store(correct: correctAnswers, total: self.questionsAmount)
-            let text = statisticService.getResultStatisticMessage(correct: correctAnswers, total: self.questionsAmount)
+            statisticService.store(correct: correctAnswers, total: questionsAmount)
+            let text = statisticService.getResultStatisticMessage(correct: correctAnswers, total: questionsAmount)
             let viewModel = QuizResultsViewModel(
                 title: "Этот раунд окончен!",
                 text: text,
@@ -100,9 +94,9 @@ final class MovieQuizPresenter: QuestionFactoryDelegate {
                 accessibilityId: "Game results"
             )
             // показать результат квиза
-            self.viewController?.show(quiz: viewModel)
+            viewController?.show(quiz: viewModel)
         } else {
-            self.switchToNextQuestion()
+            switchToNextQuestion()
             questionFactory?.requestNextQuestion()
         }
     }
@@ -123,9 +117,16 @@ final class MovieQuizPresenter: QuestionFactoryDelegate {
         guard let currentQuestion = currentQuestion else {
             return
         }
-            
+        
+        viewController?.disableAndEnableButtonsAfterDelay()
         let givenAnswer = isYes
             
         showAnswerResult(isCorrect: givenAnswer == currentQuestion.correctAnswer)
+    }
+    
+    private func didAnswer(isCorrectAnswer: Bool) {
+        if isCorrectAnswer {
+            correctAnswers += 1
+        }
     }
 }
